@@ -93,3 +93,14 @@ Then(/^I see the message "([^"]*)"$/,  (message) => {
     cy.contains(message);
 });
 
+Then(/^I login as "([^"]*)" with pwd "([^"]*)" and I see that request body for login does not contain password as a plain text$/,  (email, password) => {
+        cy.visit('/#/login');
+        cy.intercept('/rest/user/login').as('login')
+         cy.get('[name="email"]').type(email);
+         cy.get('[name="password"]').type(password);
+         cy.get('[aria-label="Login"]').click();
+         cy.wait('@login').then((interception) => {
+             cy.log("Password in request "+ interception.request.body.password);
+             expect(interception.request.body.password).not.to.equal(password);
+         })
+});

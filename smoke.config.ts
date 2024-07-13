@@ -11,8 +11,8 @@ export default defineConfig({
   e2e: {
     ...config.e2e,
     baseUrl: 'http://demo.owasp-juice.shop',
-    specPattern: 'cypress/integration/smoke/*.{feature,features}',
-//     specPattern: 'cypress/integration/smoke/test1.feature',
+//     specPattern: 'cypress/integration/smoke/*.{feature,features}',
+    specPattern: 'cypress/integration/smoke/SecurityTask.feature',
 
 
   },
