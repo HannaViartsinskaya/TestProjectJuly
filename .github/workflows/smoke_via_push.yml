@@ -1,0 +1,45 @@
+name: Auto E2E runs via push to repo
+
+on: [ push ]
+
+env:
+  CI: 1 # minimal progress output
+  TERM: xterm # good terminal rendering
+
+jobs:
+  e2e:
+    name: Cypress tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache NPM modules
+        uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+      - name: Cache Cypress binary
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/Cypress
+          key: ${{ runner.os }}-cypress-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-cypress-
+      - name: install Cypress
+        run: |
+          npm ci
+          npx cypress verify
+      - name: Clean reports
+        run: npm run clean:reports
+      - name: E2E tests
+        run: npm run cy:run
+      - name: Generate HTML
+        if: always()
+        run: npm run generate:report
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: testreport
+          path: cypress/reports/
